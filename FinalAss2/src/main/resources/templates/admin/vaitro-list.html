@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý vai trò</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .header-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9));
+            backdrop-filter: blur(20px);
+            padding: 35px 45px;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            margin-bottom: 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: bounceIn 0.8s ease-out;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        h2 {
+            color: #1a202c;
+            font-size: 32px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 10px 25px rgba(245, 87, 108, 0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 14px 30px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 700;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            transition: all 0.4s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5);
+        }
+
+        .card {
+            background: white;
+            padding: 45px;
+            border-radius: 25px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+            margin-bottom: 30px;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card h3 {
+            color: #2d3748;
+            font-size: 24px;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 4px solid;
+            border-image: linear-gradient(90deg, #f093fb, #f5576c) 1;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            color: #4a5568;
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            background: #f8fafc;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #f093fb;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(240, 147, 251, 0.1);
+            transform: translateY(-2px);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            padding: 15px 35px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            box-shadow: 0 8px 20px rgba(245, 87, 108, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #e2e8f0, #cbd5e0);
+            color: #2d3748;
+            padding: 15px 35px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #cbd5e0, #a0aec0);
+            transform: translateY(-2px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
+        }
+
+        th {
+            padding: 20px 25px;
+            text-align: left;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        th:first-child {
+            border-radius: 15px 0 0 0;
+        }
+
+        th:last-child {
+            border-radius: 0 15px 0 0;
+        }
+
+        tbody tr {
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: linear-gradient(135deg, #fef5f7, #fef9fb);
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(240, 147, 251, 0.2);
+        }
+
+        td {
+            padding: 20px 25px;
+            color: #4a5568;
+            border-bottom: 1px solid #f7fafc;
+            font-size: 15px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .actions a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 700;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .actions a:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .actions a:last-child:hover {
+            background: #ef4444;
+        }
+
+        .back-nav {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .back-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            padding: 14px 30px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 12px;
+            backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+            display: inline-block;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateX(-8px);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header-card">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div class="icon-box">🧩</div>
+            <h2>Quản lý vai trò</h2>
+        </div>
+        <a href="/admin/vai-tro/create" class="btn-primary">+ Thêm vai trò mới</a>
+    </div>
+
+    <div th:if="${vt != null}" class="card">
+        <h3 th:text="${vt.id == null ? 'Thêm vai trò' : 'Chỉnh sửa vai trò'}"></h3>
+        <form th:action="@{/admin/vai-tro/save}" method="post" th:object="${vt}">
+            <input type="hidden" th:field="*{id}" />
+
+            <div class="form-group">
+                <label>Tên vai trò:</label>
+                <input type="text" th:field="*{ten}" required placeholder="Nhập tên vai trò..." />
+            </div>
+
+            <div class="form-group">
+                <label>Mô tả:</label>
+                <textarea th:field="*{moTa}" placeholder="Nhập mô tả về vai trò này..."></textarea>
+            </div>
+
+            <div class="button-group">
+                <button type="submit">💾 Lưu</button>
+                <a href="/admin/vai-tro" class="btn-secondary">Hủy</a>
+            </div>
+        </form>
+    </div>
+
+    <div th:if="${list != null}" class="card">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tên vai trò</th>
+                <th>Mô tả</th>
+                <th>Hành động</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="v : ${list}">
+                <td><strong th:text="${v.id}"></strong></td>
+                <td><strong th:text="${v.ten}"></strong></td>
+                <td th:text="${v.moTa}"></td>
+                <td class="actions">
+                    <a th:href="@{'/admin/vai-tro/edit/' + ${v.id}}">✏️ Sửa</a>
+                    <a th:href="@{'/admin/vai-tro/delete/' + ${v.id}}" onclick="return confirm('Xóa vai trò này?')">🗑️ Xóa</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="back-nav">
+        <a href="/admin/dashboard" class="back-link">← Quay lại dashboard</a>
+    </div>
+</div>
+</body>
+</html>

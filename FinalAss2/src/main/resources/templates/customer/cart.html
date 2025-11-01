@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Giỏ hàng</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+            border-radius: 50%;
+            top: -200px;
+            right: -200px;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08), transparent);
+            border-radius: 50%;
+            bottom: -150px;
+            left: -150px;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(20px, 20px) rotate(180deg); }
+        }
+
+        .cart-wrapper {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 45px 50px;
+            border-radius: 30px;
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 1100px;
+            position: relative;
+            z-index: 10;
+            animation: slideUp 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(100px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .cart-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .cart-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        h2 {
+            color: #1a202c;
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 16px;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 60px 40px;
+            background: linear-gradient(135deg, #f8f9ff, #f0f3ff);
+            border-radius: 20px;
+            margin: 30px 0;
+        }
+
+        .empty-cart p {
+            color: #4a5568;
+            font-size: 18px;
+            margin-bottom: 25px;
+        }
+
+        .empty-cart a {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .empty-cart a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .cart-items {
+            margin-bottom: 35px;
+        }
+
+        .cart-item {
+            background: linear-gradient(135deg, #ffffff, #f8f9ff);
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 25px 30px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease backwards;
+        }
+
+        .cart-item:nth-child(1) { animation-delay: 0.1s; }
+        .cart-item:nth-child(2) { animation-delay: 0.2s; }
+        .cart-item:nth-child(3) { animation-delay: 0.3s; }
+        .cart-item:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .cart-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+            border-color: #667eea;
+        }
+
+        .item-name {
+            font-weight: 700;
+            color: #1a202c;
+            font-size: 17px;
+        }
+
+        .item-quantity {
+            text-align: center;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .item-price {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .item-total {
+            color: #f093fb;
+            font-weight: 800;
+            font-size: 18px;
+        }
+
+        .remove-btn {
+            background: linear-gradient(135deg, #fc466b, #3f5efb);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            box-shadow: 0 5px 15px rgba(252, 70, 107, 0.3);
+        }
+
+        .remove-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(252, 70, 107, 0.4);
+        }
+
+        .cart-summary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 35px 40px;
+            border-radius: 25px;
+            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.4);
+            margin-bottom: 30px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .summary-row:last-child {
+            border-top: 2px solid rgba(255, 255, 255, 0.3);
+            padding-top: 20px;
+            margin-top: 20px;
+            margin-bottom: 0;
+        }
+
+        .summary-label {
+            font-weight: 600;
+        }
+
+        .summary-value {
+            font-weight: 800;
+            font-size: 20px;
+        }
+
+        .total-amount {
+            font-size: 36px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 16px 40px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-checkout {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            box-shadow: 0 10px 25px rgba(56, 239, 125, 0.3);
+        }
+
+        .btn-checkout:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(56, 239, 125, 0.4);
+        }
+
+        .btn-continue {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn-continue:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(79, 172, 254, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .cart-item {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="cart-wrapper">
+    <div class="cart-header">
+        <div class="cart-icon">🛒</div>
+        <h2>Giỏ hàng của bạn</h2>
+        <p class="subtitle">Xem lại các sản phẩm đã chọn</p>
+    </div>
+
+    <div th:if="${#lists.isEmpty(cart)}" class="empty-cart">
+        <p>🛍️ Giỏ hàng của bạn đang trống</p>
+        <a href="/customer/lobby">👉 Khám phá sản phẩm ngay</a>
+    </div>
+
+    <div th:unless="${#lists.isEmpty(cart)}">
+        <div class="cart-items">
+            <div class="cart-item" th:each="item : ${cart}">
+                <div class="item-name" th:text="${item.sanPham.ten}"></div>
+                <div style="text-align: center;">
+                    <span class="item-quantity" th:text="${item.soLuong} + ' sản phẩm'"></span>
+                </div>
+                <div class="item-price" th:text="${#numbers.formatDecimal(item.sanPham.gia, 1, 0, 'COMMA')} + ' đ'"></div>
+                <div class="item-total" th:text="${#numbers.formatDecimal(item.soLuong * item.sanPham.gia, 1, 0, 'COMMA')} + ' đ'"></div>
+                <a th:href="@{'/customer/remove-from-cart/' + ${item.id}}" class="remove-btn">🗑️ Xóa</a>
+            </div>
+        </div>
+
+        <div class="cart-summary">
+            <div class="summary-row">
+                <span class="summary-label">Tổng tiền:</span>
+                <span class="summary-value total-amount" th:text="${#numbers.formatDecimal(tongTien, 1, 0, 'COMMA')} + ' đ'">0 đ</span>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <form action="/customer/checkout" method="post" style="display: inline;">
+                <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+                <button type="submit" class="btn btn-checkout">💳 Thanh toán ngay</button>
+            </form>
+            <a href="/customer/lobby" class="btn btn-continue">🔙 Tiếp tục mua hàng</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

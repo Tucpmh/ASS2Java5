@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Bán hàng tại quầy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.15), transparent);
+            border-radius: 50%;
+            top: -300px;
+            right: -200px;
+            animation: float 12s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-30px, 30px); }
+        }
+
+        .pos-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* LEFT PANEL - PRODUCTS */
+        .products-panel {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            background: linear-gradient(to bottom, rgba(26, 26, 46, 0.8), rgba(22, 33, 62, 0.9));
+            backdrop-filter: blur(20px);
+        }
+
+        .products-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .products-panel::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .products-panel::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.5);
+            border-radius: 10px;
+        }
+
+        .top-navigation {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+            animation: slideInLeft 0.6s ease;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 22px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .panel-header {
+            margin-bottom: 25px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .panel-header h2 {
+            color: white;
+            font-size: 28px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 8px 20px rgba(240, 147, 251, 0.4);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .product-item {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 255, 0.95));
+            border-radius: 18px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid transparent;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            animation: scaleIn 0.5s ease backwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-item:nth-child(1) { animation-delay: 0.1s; }
+        .product-item:nth-child(2) { animation-delay: 0.15s; }
+        .product-item:nth-child(3) { animation-delay: 0.2s; }
+        .product-item:nth-child(4) { animation-delay: 0.25s; }
+        .product-item:nth-child(5) { animation-delay: 0.3s; }
+        .product-item:nth-child(6) { animation-delay: 0.35s; }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .product-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .product-item:hover::before {
+            transform: scaleX(1);
+        }
+
+        .product-item:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .product-item h4 {
+            color: #1a202c;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .product-item p {
+            color: #718096;
+            font-size: 13px;
+            margin: 5px 0;
+        }
+
+        .product-price {
+            color: #f093fb;
+            font-weight: 800;
+            font-size: 22px;
+            margin: 12px 0;
+            display: block;
+        }
+
+        .input-section {
+            margin-top: 15px;
+        }
+
+        .input-section label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #2d3748;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-section input,
+        .input-section select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: white;
+            font-family: inherit;
+        }
+
+        .input-section input:focus,
+        .input-section select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .add-to-cart {
+            width: 100%;
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            box-shadow: 0 5px 15px rgba(67, 233, 123, 0.3);
+        }
+
+        .add-to-cart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(67, 233, 123, 0.4);
+        }
+
+        /* RIGHT PANEL - CART */
+        .cart-panel {
+            width: 450px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(248, 249, 255, 0.98));
+            backdrop-filter: blur(20px);
+            border-left: 3px solid rgba(102, 126, 234, 0.3);
+            padding: 30px;
+            overflow-y: auto;
+            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.2);
+            animation: slideInRight 0.6s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .cart-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .cart-panel::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+
+        .cart-panel::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.5);
+            border-radius: 10px;
+        }
+
+        .cart-header {
+            margin-bottom: 25px;
+        }
+
+        .cart-header h2 {
+            color: #1a202c;
+            font-size: 26px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cart-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .customer-selection {
+            background: linear-gradient(135deg, #f8f9ff, #f0f3ff);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .customer-selection h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #667eea;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .customer-selection select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .customer-selection select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .cart-items-list {
+            margin-bottom: 25px;
+            min-height: 200px;
+        }
+
+        .empty-cart-message {
+            text-align: center;
+            padding: 60px 20px;
+            color: #a0aec0;
+            font-size: 16px;
+        }
+
+        .cart-item-card {
+            background: white;
+            padding: 18px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid #f0f0f0;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            animation: slideInUp 0.4s ease;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cart-item-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.15);
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: 700;
+            color: #1a202c;
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+
+        .cart-item-details {
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .cart-item-actions {
+            text-align: right;
+        }
+
+        .cart-item-total {
+            color: #f093fb;
+            font-weight: 800;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .remove-button {
+            background: linear-gradient(135deg, #fc466b, #3f5efb);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(252, 70, 107, 0.3);
+        }
+
+        .remove-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(252, 70, 107, 0.5);
+        }
+
+        .total-section {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 18px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .total-label {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .total-amount {
+            font-size: 42px;
+            font-weight: 800;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .checkout-button {
+            width: 100%;
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(17, 153, 142, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .checkout-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .checkout-button:hover::before {
+            width: 400px;
+            height: 400px;
+        }
+
+        .checkout-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(17, 153, 142, 0.5);
+        }
+
+        @media (max-width: 1200px) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .pos-container {
+                flex-direction: column;
+            }
+
+            .cart-panel {
+                width: 100%;
+                border-left: none;
+                border-top: 3px solid rgba(102, 126, 234, 0.3);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="pos-container">
+    <!-- LEFT PANEL - PRODUCTS -->
+    <div class="products-panel">
+        <div class="top-navigation">
+            <a href="/admin/dashboard" class="nav-button">← Dashboard</a>
+            <a href="/admin/pos/history" class="nav-button">📋 Lịch sử</a>
+        </div>
+
+        <div class="panel-header">
+            <h2>
+                <span class="header-icon">📦</span>
+                Danh sách sản phẩm
+            </h2>
+        </div>
+
+        <div class="products-grid">
+            <div class="product-item" th:each="sp : ${sanPhams}">
+                <h4 th:text="${sp.ten}"></h4>
+                <p>Tồn kho: <strong th:text="${sp.tonKho}"></strong></p>
+                <span class="product-price" th:text="${#numbers.formatDecimal(sp.gia, 1, 0, 'COMMA')} + ' đ'"></span>
+
+                <div style="margin-top: 15px;">
+                    <div class="input-section">
+                        <label>Số lượng:</label>
+                        <input type="number" class="qty-input" value="1" min="1" th:max="${sp.tonKho}">
+                    </div>
+
+                    <div class="input-section">
+                        <label>Giá bán (đ):</label>
+                        <input type="number" class="price-input" th:value="${sp.gia}" min="0" step="1000">
+                    </div>
+
+                    <button type="button" class="add-to-cart"
+                            th:data-id="${sp.id}"
+                            th:data-name="${sp.ten}"
+                            th:data-price="${sp.gia}"
+                            th:data-stock="${sp.tonKho}"
+                            onclick="addToCartFromButton(this)">
+                        ➕ Thêm vào giỏ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL - CART -->
+    <div class="cart-panel">
+        <div class="cart-header">
+            <h2>
+                <span class="cart-icon">🛒</span>
+                Giỏ hàng
+            </h2>
+        </div>
+
+        <!-- CUSTOMER SELECTION -->
+        <div class="customer-selection">
+            <h3>👤 Khách hàng</h3>
+            <select id="khachHangSelect" class="input-group">
+                <option value="">-- Anonymous --</option>
+                <option th:each="kh : ${khachHangs}"
+                        th:value="${kh.id}"
+                        th:text="${kh.ten} + ' - ' + ${kh.email}">
+                </option>
+            </select>
+        </div>
+
+        <div id="cartContainer" class="cart-items-list">
+            <p class="empty-cart-message">Giỏ hàng trống</p>
+        </div>
+
+        <div class="total-section">
+            <div class="total-label">Tổng cộng:</div>
+            <div class="total-amount"><span id="totalAmount">0</span> đ</div>
+        </div>
+
+        <button type="button" class="checkout-button" id="checkoutBtn" onclick="checkout()">
+            💳 Thanh toán
+        </button>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    // CSRF Token
+    const csrfToken = /*[[${_csrf.token}]]*/ '';
+
+    // Giỏ hàng tạm
+    let cartItems = [];
+
+    // Thêm item vào giỏ từ button
+    function addToCartFromButton(btnElement) {
+        const sanPhamId = parseInt(btnElement.getAttribute('data-id'));
+        const tenSp = btnElement.getAttribute('data-name');
+        const giaGoc = parseFloat(btnElement.getAttribute('data-price'));
+        const tonKho = parseInt(btnElement.getAttribute('data-stock'));
+
+        const card = btnElement.closest('.product-item');
+        const soLuong = parseInt(card.querySelector('.qty-input').value);
+        const giaBan = parseFloat(card.querySelector('.price-input').value);
+
+        addToCart(sanPhamId, tenSp, soLuong, giaBan, tonKho, card);
+    }
+
+    // Thêm item vào giỏ
+    function addToCart(sanPhamId, tenSp, soLuong, giaBan, tonKho, card) {
+
+        // Validate
+        if (soLuong <= 0 || soLuong > tonKho) {
+            alert('Số lượng không hợp lệ!');
+            return;
+        }
+
+        if (giaBan <= 0) {
+            alert('Giá bán không hợp lệ!');
+            return;
+        }
+
+        // Kiểm tra đã có trong giỏ
+        let item = cartItems.find(i => i.sanPhamId === sanPhamId);
+        if (item) {
+            if (item.soLuong + soLuong > tonKho) {
+                alert('Không đủ hàng trong kho!');
+                return;
+            }
+            item.soLuong += soLuong;
+        } else {
+            cartItems.push({
+                sanPhamId,
+                tenSp,
+                soLuong,
+                giaBan,
+                tonKho
+            });
+        }
+
+        updateCart();
+
+        // Reset input
+        card.querySelector('.qty-input').value = 1;
+    }
+
+    // Cập nhật hiển thị giỏ hàng
+    function updateCart() {
+        let html = '';
+        let total = 0;
+
+        if (cartItems.length === 0) {
+            document.getElementById('cartContainer').innerHTML =
+                '<p class="empty-cart-message">Giỏ hàng trống</p>';
+            document.getElementById('totalAmount').textContent = '0';
+            return;
+        }
+
+        cartItems.forEach((item, index) => {
+            let itemTotal = item.soLuong * item.giaBan;
+            total += itemTotal;
+            html += `
+                <div class="cart-item-card">
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${item.tenSp}</div>
+                        <div class="cart-item-details">${item.soLuong} x ${item.giaBan.toLocaleString('vi-VN')} đ</div>
+                    </div>
+                    <div class="cart-item-actions">
+                        <div class="cart-item-total">${itemTotal.toLocaleString('vi-VN')} đ</div>
+                        <button type="button" class="remove-button" onclick="removeItem(${index})">🗑️ Xóa</button>
+                    </div>
+                </div>
+            `;
+        });
+
+        document.getElementById('cartContainer').innerHTML = html;
+        document.getElementById('totalAmount').textContent = total.toLocaleString('vi-VN');
+    }
+
+    // Xóa item
+    function removeItem(index) {
+        cartItems.splice(index, 1);
+        updateCart();
+    }
+
+    // Thanh toán
+    function checkout() {
+        if (cartItems.length === 0) {
+            alert('Giỏ hàng trống!');
+            return;
+        }
+
+        if (!confirm('Xác nhận thanh toán?')) {
+            return;
+        }
+
+        // Lấy khách hàng được chọn
+        const khachHangId = document.getElementById('khachHangSelect').value;
+
+        // Tạo FormData
+        const formData = new FormData();
+
+        if (khachHangId) {
+            formData.append('khachHangId', khachHangId);
+        }
+
+        cartItems.forEach(item => {
+            formData.append('sanPhamIds', item.sanPhamId);
+            formData.append('soLuongs', item.soLuong);
+            formData.append('giaBans', item.giaBan);
+        });
+
+        // Gửi request
+        fetch('/admin/pos/checkout', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: formData
+        })
+            .then(response => response.text())
+            .then(data => {
+                if (data.startsWith('SUCCESS:')) {
+                    const hoaDonId = data.split(':')[1];
+                    // Chuyển đến trang thành công
+                    window.location.href = '/admin/pos/success/' + hoaDonId;
+                } else if (data.startsWith('ERROR:')) {
+                    const errorMsg = data.split(':')[1];
+                    alert('Lỗi: ' + errorMsg);
+                } else {
+                    alert('Có lỗi xảy ra!');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Không thể kết nối đến server!');
+            });
+    }
+</script>
+</body>
+</html>

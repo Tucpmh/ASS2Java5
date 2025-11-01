@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        .dashboard-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 35px 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            margin-bottom: 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header-left h1 {
+            color: #1a202c;
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-left p {
+            color: #718096;
+            font-size: 15px;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            padding: 12px 28px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 8px 20px rgba(245, 87, 108, 0.3);
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(245, 87, 108, 0.4);
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+
+        .menu-card {
+            background: white;
+            padding: 30px;
+            border-radius: 18px;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out backwards;
+        }
+
+        .menu-card:nth-child(1) { animation-delay: 0.1s; }
+        .menu-card:nth-child(2) { animation-delay: 0.2s; }
+        .menu-card:nth-child(3) { animation-delay: 0.3s; }
+        .menu-card:nth-child(4) { animation-delay: 0.4s; }
+        .menu-card:nth-child(5) { animation-delay: 0.5s; }
+        .menu-card:nth-child(6) { animation-delay: 0.6s; }
+        .menu-card:nth-child(7) { animation-delay: 0.7s; }
+        .menu-card:nth-child(8) { animation-delay: 0.8s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .menu-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .menu-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .menu-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-card:hover .menu-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .menu-card:nth-child(1) .menu-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .menu-card:nth-child(2) .menu-icon { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .menu-card:nth-child(3) .menu-icon { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .menu-card:nth-child(4) .menu-icon { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+        .menu-card:nth-child(5) .menu-icon { background: linear-gradient(135deg, #fa709a, #fee140); }
+        .menu-card:nth-child(6) .menu-icon { background: linear-gradient(135deg, #30cfd0, #330867); }
+        .menu-card:nth-child(7) .menu-icon { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+        .menu-card:nth-child(8) .menu-icon { background: linear-gradient(135deg, #ff9a9e, #fecfef); }
+
+        .menu-title {
+            color: #2d3748;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .menu-desc {
+            color: #718096;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .info-box {
+            background: white;
+            padding: 35px;
+            border-radius: 18px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+            text-align: center;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .info-box p {
+            color: #4a5568;
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #a0aec0;
+            font-size: 14px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-wrapper">
+    <div class="header">
+        <div class="header-left">
+            <h1>Xin chào Admin 👋</h1>
+            <p>Chào mừng bạn đến với trang quản trị hệ thống</p>
+        </div>
+        <a href="/login" class="logout-btn">🚪 Đăng xuất</a>
+    </div>
+
+    <div class="menu-grid">
+        <a href="/admin/nguoi-dung" class="menu-card">
+            <div class="menu-icon">👤</div>
+            <div class="menu-title">Người Dùng</div>
+            <p class="menu-desc">Quản lý thông tin người dùng trong hệ thống</p>
+        </a>
+
+        <a href="/admin/vai-tro" class="menu-card">
+            <div class="menu-icon">🧩</div>
+            <div class="menu-title">Vai Trò</div>
+            <p class="menu-desc">Phân quyền và quản lý vai trò</p>
+        </a>
+
+        <a href="/admin/san-pham" class="menu-card">
+            <div class="menu-icon">🛍️</div>
+            <div class="menu-title">Sản Phẩm</div>
+            <p class="menu-desc">Quản lý danh mục sản phẩm</p>
+        </a>
+
+        <a href="/admin/hoa-don" class="menu-card">
+            <div class="menu-icon">🧾</div>
+            <div class="menu-title">Hóa Đơn</div>
+            <p class="menu-desc">Xem và quản lý hóa đơn</p>
+        </a>
+
+        <a href="/admin/hoa-don-chi-tiet" class="menu-card">
+            <div class="menu-icon">📦</div>
+            <div class="menu-title">Chi Tiết Hóa Đơn</div>
+            <p class="menu-desc">Chi tiết từng đơn hàng</p>
+        </a>
+
+        <a href="/admin/lich-su-hoa-don" class="menu-card">
+            <div class="menu-icon">🕐</div>
+            <div class="menu-title">Lịch Sử Hóa Đơn</div>
+            <p class="menu-desc">Theo dõi lịch sử giao dịch</p>
+        </a>
+
+        <a href="/admin/gio-hang-tam" class="menu-card">
+            <div class="menu-icon">🛒</div>
+            <div class="menu-title">Giỏ Hàng</div>
+            <p class="menu-desc">Quản lý giỏ hàng tạm</p>
+        </a>
+
+        <a href="/admin/pos" class="menu-card">
+            <div class="menu-icon">💳</div>
+            <div class="menu-title">Bán Tại Quầy</div>
+            <p class="menu-desc">Giao diện bán hàng POS</p>
+        </a>
+    </div>
+
+    <div class="info-box">
+        <p>🧭 Chọn một chức năng từ menu để bắt đầu quản lý hệ thống</p>
+    </div>
+
+    <div class="footer">© 2025 Admin Dashboard - Hệ thống quản lý bán hàng</div>
+</div>
+</body>
+</html>

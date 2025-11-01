@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Timeline Hóa Đơn</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            animation: slideDown 0.6s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .header-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+
+        .header-title h1 {
+            color: #1a202c;
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .header-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            background: linear-gradient(135deg, #f8f9ff, #f0f3ff);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .info-label {
+            color: #718096;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            color: #1a202c;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+            color: white;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+        }
+
+        .timeline-section {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #667eea, #764ba2);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            animation: slideInLeft 0.5s ease backwards;
+        }
+
+        .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+        .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+        .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+        .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -31px;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border: 4px solid #667eea;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+        }
+
+        .timeline-content {
+            background: linear-gradient(135deg, #f8f9ff, #ffffff);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .timeline-status {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .timeline-time {
+            color: #718096;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .timeline-note {
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .timeline-user {
+            color: #a0aec0;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .update-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: slideInRight 0.8s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #4a5568;
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(17, 153, 142, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(17, 153, 142, 0.4);
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+        }
+
+        .empty-timeline {
+            text-align: center;
+            padding: 60px 20px;
+            color: #a0aec0;
+        }
+
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- HEADER -->
+    <div class="header-card">
+        <div class="nav-buttons">
+            <a href="/admin/hoa-don" class="nav-btn">← Danh sách hóa đơn</a>
+            <a href="/admin/dashboard" class="nav-btn">🏠 Dashboard</a>
+        </div>
+
+        <div class="header-title">
+            <div class="header-icon">📊</div>
+            <h1 th:text="'Timeline Hóa Đơn #' + ${hoaDon.id}"></h1>
+        </div>
+
+        <div class="header-info" th:if="${hoaDon}">
+            <div class="info-item">
+                <span class="info-label">Khách hàng</span>
+                <span class="info-value">
+                    <span th:if="${hoaDon.nguoiDung != null}" th:text="${hoaDon.nguoiDung.ten}"></span>
+                    <span th:if="${hoaDon.nguoiDung == null}">Anonymous</span>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Loại bán</span>
+                <span class="info-value" th:text="${hoaDon.loaiBan}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Tổng tiền</span>
+                <span class="info-value" th:text="${#numbers.formatDecimal(hoaDon.tongTien, 1, 0, 'COMMA')} + ' đ'"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Trạng thái</span>
+                <span class="status-badge" th:text="${hoaDon.trangThai}"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <!-- TIMELINE -->
+        <div class="timeline-section">
+            <h2 class="section-title">🕐 Lịch sử thay đổi</h2>
+
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+            <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+            <div th:if="${timeline != null && timeline.size() > 0}" class="timeline">
+                <div class="timeline-item" th:each="item : ${timeline}">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-status" th:text="${item.trangThai}"></div>
+                        <div class="timeline-time" th:text="${#temporals.format(item.ngayCapNhat, 'dd/MM/yyyy HH:mm:ss')}"></div>
+                        <div class="timeline-note" th:if="${item.ghiChu}" th:text="${item.ghiChu}"></div>
+                        <div class="timeline-user">
+                            👤 <span th:text="${item.nhanVienCapNhat}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${timeline == null || timeline.size() == 0}" class="empty-timeline">
+                <p>📭 Chưa có lịch sử thay đổi</p>
+            </div>
+        </div>
+
+        <!-- FORM CẬP NHẬT -->
+        <div class="update-section">
+            <h2 class="section-title">✏️ Cập nhật trạng thái</h2>
+
+            <form th:action="@{/admin/hoa-don/update-status/{id}(id=${hoaDon.id})}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+                <div class="form-group">
+                    <label>Trạng thái mới</label>
+                    <select name="trangThai" required>
+                        <option value="">-- Chọn trạng thái --</option>
+                        <option value="Chờ xử lý">Chờ xử lý</option>
+                        <option value="Đang xử lý">Đang xử lý</option>
+                        <option value="Đang chuẩn bị">Đang chuẩn bị</option>
+                        <option value="Đang giao hàng">Đang giao hàng</option>
+                        <option value="Hoàn thành">Hoàn thành</option>
+                        <option value="Đã hủy">Đã hủy</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Ghi chú</label>
+                    <textarea name="ghiChu" placeholder="Nhập lý do thay đổi..."></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    💾 Cập nhật và ghi lịch sử
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

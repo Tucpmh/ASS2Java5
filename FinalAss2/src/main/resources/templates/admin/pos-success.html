@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thanh toán thành công</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .success-card {
+            background: white;
+            max-width: 800px;
+            width: 100%;
+            border-radius: 30px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            animation: scaleIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .header-banner {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 50px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-banner::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -150px;
+            right: -150px;
+        }
+
+        .success-icon {
+            width: 90px;
+            height: 90px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 50px;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .header-banner h2 {
+            color: white;
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .order-number {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .content-section {
+            padding: 45px 50px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #f8f9ff, #f0f3ff);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-box label {
+            display: block;
+            color: #718096;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-box strong {
+            color: #1a202c;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .products-section h3 {
+            color: #2d3748;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #e2e8f0;
+        }
+
+        .products-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+        .products-table thead tr {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .products-table th {
+            padding: 15px 18px;
+            text-align: left;
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        .products-table th:first-child {
+            border-radius: 10px 0 0 10px;
+        }
+
+        .products-table th:last-child {
+            border-radius: 0 10px 10px 0;
+            text-align: right;
+        }
+
+        .products-table tbody tr {
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+        }
+
+        .products-table tbody tr:hover {
+            background: #eef2ff;
+            transform: translateX(5px);
+        }
+
+        .products-table td {
+            padding: 15px 18px;
+            color: #4a5568;
+            font-size: 14px;
+        }
+
+        .products-table td:first-child {
+            border-radius: 10px 0 0 10px;
+            font-weight: 600;
+        }
+
+        .products-table td:last-child {
+            border-radius: 0 10px 10px 0;
+            text-align: right;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .total-banner {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(240, 147, 251, 0.3);
+        }
+
+        .total-banner .label {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+
+        .total-banner .amount {
+            font-size: 42px;
+            font-weight: 800;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 35px;
+        }
+
+        .btn {
+            padding: 16px 35px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 15px;
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-print:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-continue {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            box-shadow: 0 8px 20px rgba(17, 153, 142, 0.3);
+        }
+
+        .btn-continue:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(17, 153, 142, 0.4);
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .action-buttons {
+                display: none;
+            }
+            .success-card {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="success-card">
+    <div class="header-banner">
+        <div class="success-icon">✅</div>
+        <h2>Thanh toán thành công</h2>
+        <div class="order-number" th:if="${hoaDon}" th:text="'Mã hóa đơn: #' + ${hoaDon.id}"></div>
+    </div>
+
+    <div class="content-section" th:if="${hoaDon}">
+        <div class="info-grid">
+            <div class="info-box">
+                <label>Loại bán:</label>
+                <strong th:text="${hoaDon.loaiBan == 'QUAY' ? '🪙 Bán tại quầy' : '🌐 Bán online'}"></strong>
+            </div>
+            <div class="info-box">
+                <label>Khách hàng:</label>
+                <strong th:text="${hoaDon.nguoiDung != null ? hoaDon.nguoiDung.ten : 'Anonymous'}"></strong>
+            </div>
+            <div class="info-box">
+                <label>Ngày bán:</label>
+                <strong th:text="${#temporals.format(hoaDon.ngayTao, 'dd/MM/yyyy HH:mm')}"></strong>
+            </div>
+        </div>
+
+        <div class="products-section" th:if="${hoaDon.chiTiets != null && hoaDon.chiTiets.size() > 0}">
+            <h3>📦 Danh sách sản phẩm</h3>
+            <table class="products-table">
+                <thead>
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th style="text-align: center;">Số lượng</th>
+                    <th style="text-align: right;">Đơn giá</th>
+                    <th style="text-align: right;">Thành tiền</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="ct : ${hoaDon.chiTiets}">
+                    <td th:text="${ct.sanPham.ten}"></td>
+                    <td style="text-align: center;" th:text="${ct.soLuong}"></td>
+                    <td style="text-align: right;" th:text="${#numbers.formatDecimal(ct.donGia, 1, 0, 'COMMA')} + ' đ'"></td>
+                    <td th:text="${#numbers.formatDecimal(ct.soLuong * ct.donGia, 1, 0, 'COMMA')} + ' đ'"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="total-banner">
+            <div class="label">Tổng cộng</div>
+            <div class="amount">
+                <span th:text="${#numbers.formatDecimal(hoaDon.tongTien, 1, 0, 'COMMA')}">0</span> đ
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-print" onclick="window.print()">🖨️ In hóa đơn</button>
+            <a href="/admin/pos" class="btn btn-continue">➕ Bán hàng tiếp</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

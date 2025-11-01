@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Người Dùng</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+            background: linear-gradient(to bottom right, #141E30, #243B55);
+            min-height: 100vh;
+            padding: 50px 30px;
+        }
+
+        .page-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            animation: slideInFromLeft 0.8s ease;
+        }
+
+        @keyframes slideInFromLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .title-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+            animation: rotate3d 3s ease-in-out infinite;
+        }
+
+        @keyframes rotate3d {
+            0%, 100% { transform: rotateY(0deg); }
+            50% { transform: rotateY(180deg); }
+        }
+
+        h2 {
+            color: white;
+            font-size: 36px;
+            font-weight: 800;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            padding: 16px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(56, 239, 125, 0.4);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(56, 239, 125, 0.5);
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 50px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin-bottom: 40px;
+            animation: zoomIn 0.6s ease;
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .form-container h3 {
+            color: #1a202c;
+            font-size: 26px;
+            margin-bottom: 35px;
+            padding-bottom: 20px;
+            border-bottom: 4px solid transparent;
+            border-image: linear-gradient(90deg, #667eea, #764ba2) 1;
+            font-weight: 700;
+        }
+
+        .form-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-field label {
+            color: #2d3748;
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .form-field input,
+        .form-field textarea {
+            padding: 16px 20px;
+            border: 3px solid #e2e8f0;
+            border-radius: 15px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            background: #f8fafc;
+        }
+
+        .form-field input:focus,
+        .form-field textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .form-field textarea {
+            resize: vertical;
+            min-height: 110px;
+        }
+
+        .form-field small {
+            color: #718096;
+            font-size: 13px;
+            margin-top: 6px;
+            font-style: italic;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 18px;
+            margin-top: 35px;
+            justify-content: flex-start;
+        }
+
+        button[type="submit"] {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 16px 40px;
+            border: none;
+            border-radius: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-cancel {
+            background: linear-gradient(135deg, #cbd5e0, #e2e8f0);
+            color: #2d3748;
+            padding: 16px 40px;
+            border-radius: 15px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn-cancel:hover {
+            background: linear-gradient(135deg, #a0aec0, #cbd5e0);
+            transform: translateY(-2px);
+        }
+
+        .table-wrapper {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 15px;
+        }
+
+        thead tr {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        th {
+            padding: 22px 20px;
+            text-align: left;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+
+        th:first-child {
+            border-radius: 18px 0 0 18px;
+        }
+
+        th:last-child {
+            border-radius: 0 18px 18px 0;
+        }
+
+        tbody tr {
+            background: white;
+            transition: all 0.4s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        tbody tr:hover {
+            transform: translateX(10px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.25);
+        }
+
+        td {
+            padding: 22px 20px;
+            color: #4a5568;
+            font-size: 15px;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        td:first-child {
+            border-left: 1px solid #f0f0f0;
+            border-radius: 18px 0 0 18px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        td:last-child {
+            border-right: 1px solid #f0f0f0;
+            border-radius: 0 18px 18px 0;
+        }
+
+        .action-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .action-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 700;
+            padding: 10px 18px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .action-links a:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .action-links a:last-child:hover {
+            background: #ef4444;
+        }
+
+        .back-navigation {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .back-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            padding: 16px 35px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50px;
+            backdrop-filter: blur(20px);
+            transition: all 0.4s ease;
+            display: inline-block;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            font-size: 16px;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateX(-10px);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrapper">
+    <div class="top-bar">
+        <div class="page-title">
+            <div class="title-icon">👤</div>
+            <h2>Quản lý Người Dùng</h2>
+        </div>
+        <a href="/admin/nguoi-dung/create" class="btn-add">+ Thêm mới</a>
+    </div>
+
+    <div th:if="${nd != null}" class="form-container">
+        <h3 th:text="${nd.id == null ? 'Thêm người dùng' : 'Chỉnh sửa người dùng'}"></h3>
+        <form th:action="@{/admin/nguoi-dung/save}" method="post" th:object="${nd}">
+            <input type="hidden" th:field="*{id}" />
+
+            <div class="form-layout">
+                <div class="form-field">
+                    <label>Tên:</label>
+                    <input type="text" th:field="*{ten}" required />
+                </div>
+
+                <div class="form-field">
+                    <label>Email:</label>
+                    <input type="email" th:field="*{email}" required />
+                </div>
+
+                <div class="form-field">
+                    <label>Mật khẩu:</label>
+                    <input type="password" th:field="*{matKhau}" />
+                    <small>Để trống nếu không muốn thay đổi mật khẩu</small>
+                </div>
+
+                <div class="form-field">
+                    <label>SĐT:</label>
+                    <input type="text" th:field="*{sdt}" />
+                </div>
+            </div>
+
+            <div class="form-field" style="margin-top: 25px;">
+                <label>Địa chỉ:</label>
+                <textarea th:field="*{diaChi}"></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit">💾 Lưu</button>
+                <a href="/admin/nguoi-dung" class="btn-cancel">Hủy</a>
+            </div>
+        </form>
+    </div>
+
+    <div th:if="${list != null}" class="table-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tên</th>
+                <th>Email</th>
+                <th>SĐT</th>
+                <th>Địa chỉ</th>
+                <th>Hành động</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="u : ${list}">
+                <td th:text="${u.id}"></td>
+                <td th:text="${u.ten}"></td>
+                <td th:text="${u.email}"></td>
+                <td th:text="${u.sdt}"></td>
+                <td th:text="${u.diaChi}"></td>
+                <td>
+                    <div class="action-links">
+                        <a th:href="@{'/admin/nguoi-dung/edit/' + ${u.id}}">✏️ Sửa</a>
+                        <a th:href="@{'/admin/nguoi-dung/delete/' + ${u.id}}" onclick="return confirm('Xóa người dùng này?')">🗑️ Xóa</a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="back-navigation">
+        <a href="/admin/dashboard" class="back-link">⬅️ Quay lại Dashboard</a>
+    </div>
+</div>
+</body>
+</html>
